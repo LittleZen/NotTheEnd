@@ -1,7 +1,9 @@
 import re
+import time
 import random
 from random import sample
 from typing import Tuple
+
 
 '''
     Decode the command raised, and extract the params
@@ -70,6 +72,7 @@ def confusione(lowered: str) -> Tuple[int, int]:   # [TO DO ]
     num_token_nere = numbers[2]
 
     # Randomizzazione delle fish, tra bianche e nere, prima dell'estrazione finale
+    random.seed(time.time())
     tmpBianche = random.randint(0,num_token_random)
     tmpBlack = num_token_random - tmpBianche
     token_bianche_random, token_nere_random = estrai_token(numerical_array_to_string([(tmpBianche + tmpBlack), tmpBianche , tmpBlack]))
