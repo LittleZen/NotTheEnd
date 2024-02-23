@@ -4,22 +4,27 @@ from dotenv import load_dotenv
 from discord import Intents, Client, Message
 from responses import get_response
 
-# STEP 0: LOAD OUR TOKEN FROM SOMEWHERE SAFE
+# LOAD DISCORD TOKEN FROM ENV
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
+LOG_STATUS: Final[bool] = os.getenv('LOG_STATUS')
 
-# STEP 1: BOT SETUP
+# BOT SETTINGS
 intents: Intents = Intents.default()
-intents.message_content = True  # NOQA
+intents.message_content = True
 client: Client = Client(intents=intents)
 
 
-# STEP 2: MESSAGE FUNCTIONALITY
+# MESSAGE FUNCTIONALITY
 async def send_message(message: Message, user_message: str) -> None:
+
+    if not user_message.startswith('!') and not user_message:
+        return
+    
     if not user_message:
         print('[FATAL]: Message was empty because intents were not enabled on discord bot dashboard')
         return
-
+    
     if is_private := user_message[0] == '?':
         user_message = user_message[1:]
 
@@ -47,7 +52,8 @@ async def on_message(message: Message) -> None:
     user_message: str = message.content
     channel: str = str(message.channel)
 
-    print(f'[Channel: {channel}]: {username} --> "{user_message}"')
+    if LOG_STATUS:
+        print(f'[Channel: {channel}]: {username} --> "{user_message}"')
     await send_message(message, user_message)
 
 

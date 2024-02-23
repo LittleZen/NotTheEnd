@@ -64,6 +64,7 @@ def confusione(lowered: str) -> Tuple[int, int]:   # [TO DO ]
 
     numbers = extract_integers_from_sentence(lowered) # decode the command params
 
+    print(f">>>{numbers}")
     num_token_da_estrarre = numbers[0]
     num_token_random = numbers[1]
     num_token_nere = numbers[2]
