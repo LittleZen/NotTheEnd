@@ -18,3 +18,4 @@ engine/__pycache__
 # env file
 .env
 discord_bot_info.txt
+note.txt
