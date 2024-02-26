@@ -2,18 +2,20 @@ import os
 import discord
 from typing import Final
 from dotenv import load_dotenv
-from discord import Intents, Client, Message
+from discord import Intents
+from discord.ext import commands
 from Controllers.controller import Controller
 
 # Carica il token e avvia le fasi preliminari del bot
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
-LOG_STATUS: Final[bool] = os.getenv('LOG_STATUS')
 
 # Dichiarazione d'intenti (utilizzata da discord)
 intents: Intents = Intents.default()
 intents.message_content = True
 
+# Crea l'istanza del bot con un prefisso per i comandi
+bot = commands.Bot(command_prefix='!', intents=discord.Intents.default())
 
 class DClient(discord.Client):
 
@@ -25,6 +27,11 @@ class DClient(discord.Client):
     async def on_ready(self) -> None:
         print(f'\n> Logged on as {self.user}!\n')
 
+    @bot.command(name='somma')
+    async def somma(ctx, *numeri: int):
+        risultato = sum(numeri)
+        await ctx.send(f'La somma dei valori è {risultato}.')
+
     # Gestore: della ricezione da parte di un utente dei messaggi [move?] [cambiare?]
     async def on_message(self, message: discord.Message) -> None:
         if message.author == self.user:
@@ -34,8 +41,7 @@ class DClient(discord.Client):
         user_message: str = message.content
         channel: str = str(message.channel)
 
-        if LOG_STATUS:
-            print(f'[Channel: {channel}]: {username} --> "{user_message}"')
+        #print(f'{LOG_STATUS} [Channel: {channel}]: {username} --> "{user_message}"')
         await self.controller.send_message(message, user_message)
 
 
@@ -43,9 +49,10 @@ class DClient(discord.Client):
 
 # Funzione main, avvia il bot
 def main() -> None:
-    client = DClient(intents=intents)
-    client.run(token=TOKEN)
-
+    #client = DClient(intents=intents)
+    #client.run(token=TOKEN)
+    # Crea l'istanza del bot con un prefisso per i comandi
+    bot.run(TOKEN)
 
 # Gestore: esecuzione dello script python
 if __name__ == '__main__':

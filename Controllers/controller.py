@@ -3,6 +3,7 @@ from Services.engine import Engine
 from random import randint
 from discord import Message
 from typing import Tuple
+from Classes.random_bag import RandomBag
 
 
 class Controller():
@@ -13,15 +14,13 @@ class Controller():
 
 
 # Sistema di risposte per le prove {manca la classe <sacchetto> invece della tupla}
-    def trail_response(self, wbtuple: Tuple[int, int]) -> str:
-
-        wtoken, btoken = wbtuple
-        if(wtoken > 0):
-            wtoken = wtoken - 1
-            reply = f'Hai superato la prova!\n\nDevi ancora spende:\n:white_circle: {wtoken} bianchi\n:black_circle: {btoken} neri'
+    def trail_response(self, random_bag: RandomBag) -> str:
+        if(random_bag.exwToken > 0):
+            random_bag.exwToken = random_bag.exwToken - 1
+            reply = f'Hai superato la prova!\n\nDevi ancora spende:\n:white_circle: {random_bag.exwToken} bianchi\n:black_circle: {random_bag.exbToken} neri'
         else:
-            btoken = btoken - 1
-            reply = f'Non hai superato la prova!\n\nTi rimangono inoltre:\n:black_circle: {btoken} neri da spendere.'
+            random_bag.exbToken = random_bag.exbToken - 1
+            reply = f'Non hai superato la prova!\n\nTi rimangono inoltre:\n:black_circle: {random_bag.exbToken} neri da spendere.'
         return reply
 
 # La funzione definisce la lettura dei comandi inviati al bot.
@@ -33,15 +32,22 @@ class Controller():
             return f'You rolled: {randint(1, 10)} between 1 and 10'
         
         elif 'estrai' in user_input:
-            return self.trail_response(self.engine.estrai_token(user_input))
-        
+            try: 
+                return self.trail_response(self.engine.simple_trail(user_input))
+            except ValueError as errVal:
+                print(f"[ESTRAI - FATAL_ERROR]: {errVal}")
+                return None
+            except Exception as e:
+                print(f"[ESTRAI - FATAL_ERROR]: {e}")
+                return None
+
         elif 'confusione' in user_input:
             try:
-                return self.trail_response(self.engine.confusione(user_input))  
+                return self.trail_response(self.engine.confused_trail(user_input))  
             except ValueError as erVal:
-                return f'Attento: {erVal}'
+                return f'[CONFUSIONE - FATAL_ERROR]: {erVal}'
             except Exception as e:
-                return f'[FATAL]: {e}'
+                return f'[CONFUSIONE - FATAL_ERROR]: {e}'
         
         else:
             return 'Scrivi bene i comandi, coglione :rage:'
@@ -53,7 +59,7 @@ class Controller():
             return
         
         if not user_message:
-            print('> [FATAL]: Message was empty, probably because intents were not enabled on discord bot dashboard')
+            print('> [send_message - FATAL_ERROR]: Message was empty, probably because intents were not enabled on discord bot dashboard')
             return
         
         # verifica se il messaggio é in un canale privato o da un server

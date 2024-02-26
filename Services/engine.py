@@ -1,18 +1,8 @@
 import re
-import time
-import random
-from random import sample
 from typing import Tuple
+from Classes.random_bag import RandomBag
 
 class Engine():
-
-    '''
-        Migliora la randomizzazione
-    '''
-    def ImprovedRnd(self) -> None:
-        rand = random.randint(1, 5)  # Genera un numero casuale di volte per reinizializzare il seed
-        for _ in range(rand):
-            random.seed(time.time())
 
     '''
         Decodifica i comandi inviati tramite regex, e ritorna i numeri interi nella frase
@@ -60,27 +50,18 @@ class Engine():
         
         :return: Una tupla contenente il numero di token bianche e nere estratte (int, int).
     """
-    def estrai_token(self, lowered : str) -> Tuple[int, int]:
+    def simple_trail(self, lowered : str) -> 'RandomBag':
+
         numbers = self.extract_integers_from_sentence(lowered) # decode the command params
 
-        if len(numbers) == 0:
-            raise ValueError("Non ci sono parametri validi nel comando")
-
-        num_token_da_estrarre = numbers[0] 
-        num_token_bianche =  numbers[1] 
-        num_token_nere =  numbers[2] 
-
-        sacchetto = ["B"] * num_token_bianche + ["N"] * num_token_nere
-
-        if num_token_da_estrarre > len(sacchetto):
-            raise ValueError("Il numero di token da estrarre supera il numero totale di token nel sacchetto.")
+        if not numbers and len(numbers) < 2:
+            raise ValueError('Invalid Params for function simple trail')
         
-        self.ImprovedRnd()
-        token_estratte = sample(sacchetto, num_token_da_estrarre)
-        token_bianche_estratte = token_estratte.count("B")
-        token_nere_estratte = token_estratte.count("N")
-        
-        return token_bianche_estratte, token_nere_estratte
+        eToken = numbers[0]
+        wToken = numbers[1]
+        bToken = numbers[2]
+
+        return RandomBag(wToken, bToken, eToken).extract_token()
 
 
     """
@@ -92,31 +73,14 @@ class Engine():
         :param num_token_nere: Numero di token nere nel sacchetto.
         :return: Una tupla contenente il numero di token bianche e nere estratte (int, int).
     """
-    def confusione(self, lowered: str) -> Tuple[int, int]:   # [TO DO ]
+    def confused_trail(self, lowered: str) -> Tuple[int, int]:
 
         numbers = self.extract_integers_from_sentence(lowered) # decode the command params
 
-        print(f">>>{numbers}")
-        num_token_da_estrarre = numbers[0]
-        num_token_random = numbers[1]
-        num_token_nere = numbers[2]
+        eToken = numbers[0]
+        rndToken = numbers[1]
+        btoken = numbers[2]
 
-        # Randomizzazione delle fish, tra bianche e nere, prima dell'estrazione finale
-        self.ImprovedRnd()
-        tmpBianche = random.randint(0,num_token_random)
-        tmpBlack = num_token_random - tmpBianche
-        token_bianche_random, token_nere_random = self.estrai_token(self.numerical_array_to_string([(tmpBianche + tmpBlack), tmpBianche , tmpBlack]))
+        return RandomBag(0, btoken, eToken, rndToken).extract_cursed_token()
 
-        num_token_nere += token_nere_random
-
-        sacchetto = ["B"] * token_bianche_random + ["N"] * num_token_nere
-
-        if num_token_da_estrarre > len(sacchetto):
-            raise ValueError("Il numero di token da estrarre supera il numero totale di token nel sacchetto.")
-        
-        token_estratte = sample(sacchetto, num_token_da_estrarre)
-        token_bianche_estratte = token_estratte.count("B") 
-        token_nere_estratte = token_estratte.count("N") 
-        
-        return token_bianche_estratte, token_nere_estratte
     
