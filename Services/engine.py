@@ -5,6 +5,15 @@ from random import sample
 from typing import Tuple
 
 class Engine():
+
+    '''
+        Migliora la randomizzazione
+    '''
+    def ImprovedRnd(self) -> None:
+        rand = random.randint(1, 5)  # Genera un numero casuale di volte per reinizializzare il seed
+        for _ in range(rand):
+            random.seed(time.time())
+
     '''
         Decodifica i comandi inviati tramite regex, e ritorna i numeri interi nella frase
 
@@ -22,6 +31,7 @@ class Engine():
         else:
             return []
         
+
     '''
         La funzione converte un array in una stringa separata dal carattere ','
 
@@ -110,11 +120,3 @@ class Engine():
         
         return token_bianche_estratte, token_nere_estratte
     
-
-    '''
-        Migliora la randomizzazione
-    '''
-    def ImprovedRnd(self) -> None:
-        rand = random.randint(1, 5)  # Genera un numero casuale di volte per reinizializzare il seed
-        for _ in range(rand):
-            random.seed(time.time())

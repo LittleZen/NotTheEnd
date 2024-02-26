@@ -13,18 +13,20 @@ LOG_STATUS: Final[bool] = os.getenv('LOG_STATUS')
 # Dichiarazione d'intenti (utilizzata da discord)
 intents: Intents = Intents.default()
 intents.message_content = True
-client: Client = Client(intents=intents)
 
 
 class DClient(discord.Client):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.controller = Controller()
+
+    # Evento: on_ready
     async def on_ready(self) -> None:
-        print(f'Logged on as {self.user}!')
+        print(f'\n> Logged on as {self.user}!\n')
 
     # Gestore: della ricezione da parte di un utente dei messaggi [move?] [cambiare?]
     async def on_message(self, message: discord.Message) -> None:
-
-        controller = Controller()
-
         if message.author == self.user:
             return
 
@@ -34,8 +36,10 @@ class DClient(discord.Client):
 
         if LOG_STATUS:
             print(f'[Channel: {channel}]: {username} --> "{user_message}"')
-        await controller.send_message(message, user_message)
+        await self.controller.send_message(message, user_message)
 
+
+ # =================================================================================================== #
 
 # Funzione main, avvia il bot
 def main() -> None:
